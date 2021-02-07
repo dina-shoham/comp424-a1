@@ -1,6 +1,7 @@
 package SixPuzzle;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class Main {
   
@@ -32,44 +33,38 @@ public class Main {
    * eg. | 1 | 4 | 2 | is represented by [1, 4, 2, 0, 3, 5]
    *     | 5 | 3 |   |
    */
-  public static ArrayList<int[]> getNextStates(int[] curState) {
-    ArrayList<int[]> nextStates = new ArrayList<int[]>();
+  public static ArrayList<Node> getNextNodes(Node curNode) {
+    ArrayList<Node> nextNodes = new ArrayList<Node>();
     
     // determine indeces of tiles that can move depending on where the space is
-    int i = getIndexOfSpace(curState);
+    int i = getIndexOfSpace(curNode.state);
     // System.out.println("space is in index " + i);
     ArrayList<int[]> movableTiles = new ArrayList<int[]>();
     
     switch (i) {
       case 0:
-//        System.out.println("case 0");
         movableTiles.add(new int[] {0, 1});
         movableTiles.add(new int[] {0, 5});
         break;       
       case 1: 
-//        System.out.println("case 1");
         movableTiles.add(new int[] {1, 0});
         movableTiles.add(new int[] {1, 2});
         movableTiles.add(new int[] {1, 4});
         break;
       case 2: 
-//        System.out.println("case 2");
         movableTiles.add(new int[] {2, 1});
         movableTiles.add(new int[] {2, 3});
         break;
       case 3: 
-//        System.out.println("case 3");
         movableTiles.add(new int[] {3, 2});
         movableTiles.add(new int[] {3, 4});
         break;
       case 4: 
-//        System.out.println("case 4");
         movableTiles.add(new int[] {4, 1});
         movableTiles.add(new int[] {4, 3});
         movableTiles.add(new int[] {4, 5});
         break;
       case 5: 
-//        System.out.println("case 5");
         movableTiles.add(new int[] {5, 0});
         movableTiles.add(new int[] {5, 4});
         break;  
@@ -78,14 +73,16 @@ public class Main {
         break;
     }
     
-    // generate list of new states
+    // generate list of new nodes
     for(int j = 0; j < movableTiles.size(); j++) {
-      int[] newState = swapElements(curState, movableTiles.get(j)[0], movableTiles.get(j)[1]);
-      //System.out.println("adding new state "+Arrays.toString(newState));
-      nextStates.add(newState);
+      Node newNode = (swapElements(curNode.state, movableTiles.get(j)[0], movableTiles.get(j)[1]));
+//      int[] newState = swapElements(curNode.state, movableTiles.get(j)[0], movableTiles.get(j)[1]);
+//      System.out.println("new state "+Arrays.toString(newState));
+      nextNodes.add(newNode);
     }
     
-    return nextStates;
+    Collections.sort(nextNodes, new Node());
+    return nextNodes;
   }
   
   // gets index of array that contains 0
@@ -97,8 +94,8 @@ public class Main {
     return i;
   }
   
-  // creates a new state that is the provided state, but with elements at index i and j swapped
-  public static int[] swapElements (int[] state, int i, int j) {
+  // creates a new node that is the provided state, but with elements at index i and j swapped
+  public static Node swapElements (int[] state, int i, int j) {
     //System.out.println("swapping "+state[i]+" with "+state[j]);
     int[] swapped = new int[6];
     for (int k = 0; k < 6; k++) {
@@ -112,10 +109,11 @@ public class Main {
         swapped[k] = state[k];
       }
     }
-    return swapped;
+    
+    return new Node(swapped, state[j]);
   }
   
-  //if state already visited return true
+  // if state already visited return true
    public static Boolean isStateVisited(int[] state, ArrayList<int[]> visitedStates) {
      for(int[] s : visitedStates) {
        if (Arrays.equals(state, s)) {

@@ -10,7 +10,7 @@ public class BreadthFirstSearch {
   
   public static ArrayList<int[]> breadthFirstSearch (int[] initState, int[] goalState) {  
     // enqueue initial node
-    Node startNode = new Node(initState, 0, null);    
+    Node startNode = new Node(initState, null, -1);    
     Node curNode = startNode;
     queue.add(startNode);
     
@@ -24,12 +24,12 @@ public class BreadthFirstSearch {
       queue.remove(0);
       
       // get next states
-      ArrayList<int[]> nextStates = Main.getNextStates(curNode.state);
-      for(int[] st : nextStates) {       
+      ArrayList<Node> nextNodes = Main.getNextNodes(curNode);
+      for(Node n : nextNodes) {       
         // enqueue all unvisited states
-        if (!Main.isStateVisited(st, visitedStates)) {
-          visitedStates.add(st);
-          Node n = new Node(st, curNode.depth++, curNode);
+        if (!Main.isStateVisited(n.state, visitedStates)) {
+          visitedStates.add(n.state);
+          n.par = curNode;
           queue.add(n);
         }
       }      
@@ -41,6 +41,7 @@ public class BreadthFirstSearch {
       solutionPath.add(curNode.state);
       curNode = curNode.par;
     }
+    solutionPath.add(initState);
     
     Collections.reverse(solutionPath);
     return solutionPath;

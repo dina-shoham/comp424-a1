@@ -12,7 +12,7 @@ public class DepthFirstSearch {
   
   public static ArrayList<int[]> depthFirstSearch (int[] initState, int[] goalState) {   
     // push initial node onto stack
-    Node startNode = new Node(initState, 0, null);    
+    Node startNode = new Node(initState, null, -1);    
     Node curNode = startNode;
     stack.push(startNode);
     
@@ -22,14 +22,15 @@ public class DepthFirstSearch {
     // while goal state has not been reached, keep searching (DFS)
     while(!Arrays.equals(curNode.state, goalState)) {
       curNode = stack.pop();
-//      System.out.println("-------popping state "+Arrays.toString(curNode.state));
       
-      ArrayList<int[]> nextStates = Main.getNextStates(curNode.state);
-      for(int[] st : nextStates) {
+      ArrayList<Node> nextNodes = Main.getNextNodes(curNode);
+      Collections.reverse(nextNodes); // have to reverse nextStates so that we prefer moving lower-numbered tiles
+      
+      for(Node n : nextNodes) {
         // push all unvisited states
-        if (!Main.isStateVisited(st, visitedStates)) {
-          visitedStates.add(st);
-          Node n = new Node(st, curNode.depth++, curNode);
+        if (!Main.isStateVisited(n.state, visitedStates)) {
+          visitedStates.add(n.state);
+          n.par = curNode;
           stack.push(n);
         }
       }      
@@ -41,6 +42,7 @@ public class DepthFirstSearch {
       solutionPath.add(curNode.state);
       curNode = curNode.par;
     }
+    solutionPath.add(initState);
     
     Collections.reverse(solutionPath);
     return solutionPath;
